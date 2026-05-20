@@ -21,12 +21,12 @@ POC_LABELS = {
 }
 
 POC_PROFILES = {
-    "OTA0221": "North Island load",
-    "HAY0331": "Lower NI load",
-    "BEN2202": "SI hydro hub",
-    "ROX1101": "SI hydro",
-    "KAW1101": "Geothermal",
-    "WHI2201": "NI thermal peaker",
+    "OTA0221": "North Island — load centre",
+    "HAY0331": "North Island — load centre",
+    "BEN2202": "South Island — hydro hub",
+    "ROX1101": "South Island — hydro",
+    "KAW1101": "North Island — geothermal",
+    "WHI2201": "North Island — thermal peaker",
 }
 
 NODE_COLORS = {
