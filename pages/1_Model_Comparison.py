@@ -1,5 +1,5 @@
 import streamlit as st
-st.set_page_config(page_title="NZ Power Pulse — Forecast", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="NZ Power Pulse — Model Comparison", page_icon="⚡", layout="wide")
 
 import plotly.graph_objects as go
 import pandas as pd

@@ -74,7 +74,8 @@ for i, poc in enumerate(cfg.POCS):
 st.divider()
 st.caption(
     "Navigate using the sidebar: "
-    "**Forecast** (model comparison by node) · "
+    "**Model Comparison** (forecast accuracy by node) · "
     "**Spike Risk** (next-24h spike heatmap) · "
-    "**Dry Year Story** (the 2024 crisis narrative)"
+    "**Dry Year Story** (the 2024 crisis narrative) · "
+    "**Predict** (interactive price prediction)"
 )
