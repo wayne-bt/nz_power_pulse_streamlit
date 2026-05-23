@@ -19,7 +19,7 @@ poc = st.sidebar.selectbox(
 selected_models = st.sidebar.multiselect(
     "Models",
     cfg.MODEL_KEYS,
-    default=["catboost", "chronos2s_finetune"],
+    default=["catboost_regressor", "chronos2s_finetune"],
     format_func=lambda m: cfg.MODEL_LABELS[m],
 )
 
@@ -125,7 +125,7 @@ for i, model in enumerate(selected_models):
         )
         c1, c2 = st.columns(2)
         c1.metric("RMSE", f"${m['rmse']:.1f}")
-        c2.metric("MAPE", f"{m['mape']:.1f}%")
+        c2.metric("sMAPE", f"{m['smape']:.1f}%")
 
 # --- Data coverage note ---
 with st.expander("Data coverage"):

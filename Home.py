@@ -21,8 +21,8 @@ st.markdown(
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Grid Nodes", "6")
 col2.metric("Models", str(len(cfg.MODEL_KEYS)))
-col3.metric("Time Span", "3.3 years")
-col4.metric("Panel Rows", "352K")
+col3.metric("Time Span", "3.9 years")
+col4.metric("Panel Rows", "412K")
 
 st.divider()
 
@@ -34,8 +34,8 @@ leaderboard = cfg.build_leaderboard()
 summary = (
     leaderboard
     .groupby("Model", sort=False)
-    .agg({"RMSE ($/MWh)": "mean", "MAPE (%)": "mean"})
-    .round({"RMSE ($/MWh)": 1, "MAPE (%)": 1})
+    .agg({"RMSE ($/MWh)": "mean", "sMAPE (%)": "mean"})
+    .round({"RMSE ($/MWh)": 1, "sMAPE (%)": 1})
     .reset_index()
 )
 
@@ -45,7 +45,7 @@ st.dataframe(
     hide_index=True,
     column_config={
         "RMSE ($/MWh)": st.column_config.NumberColumn(format="%.1f"),
-        "MAPE (%)": st.column_config.NumberColumn(format="%.1f%%"),
+        "sMAPE (%)": st.column_config.NumberColumn(format="%.1f%%"),
     },
 )
 

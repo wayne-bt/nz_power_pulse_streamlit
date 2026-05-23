@@ -10,19 +10,20 @@ import app_config as cfg
 st.markdown(cfg.CUSTOM_CSS, unsafe_allow_html=True)
 
 st.title("Next-24h Spike Risk")
+has_classifier = (cfg.PREDICTIONS_DIR / "lr_smote_spike_OTA2201.parquet").exists()
 st.caption(
-    "Probability that the spot price exceeds the per-node 95th-percentile "
-    "threshold within the next 24 hours. "
-    "Synthetic probabilities — will be replaced by classifier output."
+    "Probability that the spot price exceeds $300/MWh (spike threshold). "
+    + ("Source: LR + SMOTE classifier (Person C)."
+       if has_classifier
+       else "Synthetic probabilities — classifier output not yet available.")
 )
 
 # --- Sidebar ---
 view = st.sidebar.radio("View", ["Single node", "All nodes"])
-thresholds = cfg.get_spike_thresholds()
 
 
 def build_heatmap_data(poc: str) -> tuple:
-    spike_df = cfg.generate_synthetic_spike_probs(poc)
+    spike_df = cfg.load_spike_predictions(poc)
     spike_df["date"] = spike_df["timestamp"].dt.date
     spike_df["hour"] = spike_df["timestamp"].dt.hour
     hourly = (spike_df.groupby(["date", "hour"], as_index=False)["spike_prob"]
@@ -50,10 +51,7 @@ if view == "Single node":
         "Grid node", cfg.POCS,
         format_func=lambda p: f"{p} — {cfg.POC_LABELS[p]}",
     )
-    st.metric(
-        f"Spike threshold ({poc})",
-        f"${thresholds[poc]:.0f}/MWh",
-    )
+    st.metric(f"Spike threshold ({poc})", "$300/MWh")
 
     pivot = build_heatmap_data(poc)
     fig = go.Figure(data=heatmap_trace(pivot, poc))
@@ -66,7 +64,7 @@ if view == "Single node":
     st.plotly_chart(fig, use_container_width=True, key=f"spike_{poc}")
 
     with st.expander("Spike statistics"):
-        spike_df = cfg.generate_synthetic_spike_probs(poc)
+        spike_df = cfg.load_spike_predictions(poc)
         total = len(spike_df)
         spikes = spike_df["actual_spike"].sum()
         st.write(f"Total half-hours: {total:,}")
@@ -91,11 +89,5 @@ else:
     fig.update_layout(height=900)
     st.plotly_chart(fig, use_container_width=True, key="spike_all")
 
-    st.subheader("Spike Thresholds (95th percentile, training data)")
-    cols = st.columns(3)
-    for i, poc in enumerate(cfg.POCS):
-        with cols[i % 3]:
-            st.metric(
-                f"{poc}",
-                f"${thresholds[poc]:.0f}/MWh",
-            )
+    st.subheader("Spike Threshold")
+    st.metric("All nodes", "$300/MWh")
