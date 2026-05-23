@@ -18,9 +18,10 @@ def load_models():
     lr = joblib.load(MODELS_DIR / "linear_regression.joblib")
     lr_scaler = joblib.load(MODELS_DIR / "linear_scaler.joblib")
     cb = joblib.load(MODELS_DIR / "catboost_regressor.joblib")
-    return lr, lr_scaler, cb
+    spike_clf = joblib.load(MODELS_DIR / "lr_smote_classifier.joblib")
+    return lr, lr_scaler, cb, spike_clf
 
-lr_model, lr_scaler, cb_model = load_models()
+lr_model, lr_scaler, cb_model, spike_clf = load_models()
 
 # --- Shared inputs in sidebar ---
 st.sidebar.header("Scenario Inputs")
@@ -54,6 +55,37 @@ st.sidebar.subheader("Price Lags")
 price_lag_1h = st.sidebar.number_input("Price 1h ago ($/MWh)", -100.0, 6000.0, 138.0, 10.0)
 price_lag_24h = st.sidebar.number_input("Price 24h ago ($/MWh)", -100.0, 6000.0, 138.0, 10.0)
 price_lag_168h = st.sidebar.number_input("Price 1 week ago ($/MWh)", -100.0, 6000.0, 138.0, 10.0)
+
+# --- Spike Risk ---
+spike_features = pd.DataFrame([{
+    "hour_sin": hour_sin, "hour_cos": hour_cos,
+    "month_sin": month_sin, "month_cos": month_cos,
+    "dow_sin": dow_sin, "dow_cos": dow_cos,
+    "is_weekend": is_weekend,
+    "temp_c": temp_c, "wind_ms": wind_ms,
+    "solar_wm2": solar_wm2, "rain_mm": rain_mm,
+    "heating_degrees": heating_degrees, "cooling_degrees": cooling_degrees,
+    "price_lag_1h": price_lag_1h, "price_lag_24h": price_lag_24h,
+    "price_lag_168h": price_lag_168h,
+}])
+
+spike_prob = spike_clf.predict_proba(spike_features)[0, 1]
+
+if spike_prob >= 0.7:
+    spike_color, spike_label = cfg.COLORS["danger"], "HIGH"
+elif spike_prob >= 0.3:
+    spike_color, spike_label = "#ff9100", "MODERATE"
+else:
+    spike_color, spike_label = cfg.COLORS["success"], "LOW"
+
+st.markdown(
+    f"**Spike Risk:** "
+    f"<span style='color:{spike_color};font-weight:bold'>{spike_label}</span> "
+    f"— {spike_prob:.1%} probability price exceeds $300/MWh",
+    unsafe_allow_html=True,
+)
+
+st.divider()
 
 # --- Tabs ---
 tab_lr, tab_cb = st.tabs(["Linear Regression", "CatBoost"])
