@@ -13,7 +13,7 @@ st.title("Next-24h Spike Risk")
 has_classifier = (cfg.PREDICTIONS_DIR / "lr_smote_spike_OTA2201.parquet").exists()
 st.caption(
     "Probability that the spot price exceeds $300/MWh (spike threshold). "
-    + ("Source: LR + SMOTE classifier (Person C)."
+    + ("Source: LR + SMOTE classifier."
        if has_classifier
        else "Synthetic probabilities — classifier output not yet available.")
 )
